@@ -2,7 +2,7 @@ terraform {
     required_providers {
         confluent = {
             source = "confluentinc/confluent"
-            version = "1.13.0"
+            version = "1.21.0"
         }
         local = {
             source = "hashicorp/local"
@@ -41,6 +41,26 @@ resource "confluent_environment" "basic_env" {
     }
 }
 # --------------------------------------------------------
+# Schema Registry
+# --------------------------------------------------------
+data "confluent_schema_registry_region" "basic_sr_region" {
+    cloud = "AWS"
+    region = "us-east-2"
+    package = "ESSENTIALS" 
+}
+resource "confluent_schema_registry_cluster" "basic_sr_cluster" {
+    package = data.confluent_schema_registry_region.basic_sr_region.package
+    environment {
+        id = confluent_environment.basic_env.id 
+    }
+    region {
+        id = data.confluent_schema_registry_region.basic_sr_region.id
+    }
+    lifecycle {
+        prevent_destroy = false
+    }
+}
+# --------------------------------------------------------
 # This resource should be named by changing the 'cluster_name'
 # varible in 'input-variables.tf'
 # --------------------------------------------------------
@@ -65,6 +85,13 @@ resource "confluent_service_account" "app_manager" {
     description = "${local.description}"
 }
 # --------------------------------------------------------
+# Schema Registry SA
+# --------------------------------------------------------
+resource "confluent_service_account" "sr" {
+    display_name = "sr-${random_id.id.hex}"
+    description = "${local.description}"
+}
+# --------------------------------------------------------
 # 'clients' will be the SA used to pass created keys to
 # things like Connectors, Kafka Producers and Consumers, etc
 # --------------------------------------------------------
@@ -78,6 +105,14 @@ resource "confluent_service_account" "clients" {
 # --------------------------------------------------------
 resource "confluent_role_binding" "app_manager_environment_admin" {
     principal = "User:${confluent_service_account.app_manager.id}"
+    role_name = "EnvironmentAdmin"
+    crn_pattern = confluent_environment.basic_env.resource_name
+}
+# --------------------------------------------------------
+# Schema Registry Role Binding
+# --------------------------------------------------------
+resource "confluent_role_binding" "sr_environment_admin" {
+    principal = "User:${confluent_service_account.sr.id}"
     role_name = "EnvironmentAdmin"
     crn_pattern = confluent_environment.basic_env.resource_name
 }
@@ -113,6 +148,29 @@ resource "confluent_api_key" "app_manager_basic_cluster_key" {
         confluent_role_binding.app_manager_environment_admin
     ]
 }
+# --------------------------------------------------------
+# Schema Registry API Key, not supported yet
+# --------------------------------------------------------
+# resource "confluent_api_key" "sr_basic_sr_cluster_key" {
+#     display_name = "sr-${local.cluster_name}-key-${random_id.id.hex}"
+#     description = "${local.description}"
+#     owner {
+#         id = confluent_service_account.sr.id 
+#         api_version = confluent_service_account.sr.api_version
+#         kind = confluent_service_account.sr.kind
+#     }
+#     managed_resource {
+#         id = confluent_schema_registry_cluster.basic_sr_cluster.id
+#         api_version = confluent_schema_registry_cluster.basic_sr_cluster.api_version
+#         kind = confluent_schema_registry_cluster.basic_sr_cluster.kind 
+#         environment {
+#             id = confluent_environment.basic_env.id
+#         }
+#     }
+#     depends_on = [
+#       confluent_role_binding.sr_environment_admin
+#     ]
+# }
 # --------------------------------------------------------
 # Create the credentials for the clients SA
 # --------------------------------------------------------
