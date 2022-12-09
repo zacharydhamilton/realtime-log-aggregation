@@ -1,5 +1,5 @@
 locals {
-    env_name = ""
-    cluster_name = ""
-    description = ""
+    env_name = "template-basic-cluster"
+    cluster_name = "template-basic-cluster"
+    description = "template-basic-cluster"
 }
