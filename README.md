@@ -33,10 +33,10 @@ In order to have this work when they're actually running, you might also need to
 
 1. Clone this repo and then enter the directory.
     ```bash
-    git clone https://github.com/zacharydhamilton/<repo name>
+    git clone https://github.com/zacharydhamilton/realtime-log-aggregation
     ```
     ```bash
-    cd <repo name>
+    cd realtime-log-aggregation
     ```
 
 1. Create Confluent Cloud API Keys if you don't already have them. The documentation to create a Cloud API Key can be found [here](https://docs.confluent.io/cloud/current/access-management/authenticate/api-keys/api-keys.html#create-a-cloud-api-key).
