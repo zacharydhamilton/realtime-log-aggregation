@@ -1,0 +1,57 @@
+---
+version: '2'
+services:
+  logger:
+    hostname: logger
+    container_name: logger
+    image: logger-debug
+    depends_on:
+      - fluentbit
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:24224
+  fluentbit:
+    hostname: fluentbit
+    container_name: fluentbit
+    image: fluent/fluent-bit:2.0.8-debug
+    environment: 
+      BOOTSTRAP_SERVER: $BOOTSTRAP_SERVER
+      KAFKA_CLUSTER_KEY: $KAFKA_CLUSTER_KEY
+      KAFKA_CLUSTER_SECRET: $KAFKA_CLUSTER_SECRET
+    volumes:
+    - ./fluentbit/:/fluent-bit/etc/
+    ports:
+    - 24224:24224
+    - 24224:24224/udp
+  elasticsearch:
+    hostname: elasticsearch
+    container_name: elasticsearch
+    image: elasticsearch:7.10.1
+    environment: 
+      discovery.type: single-node
+      cluster.name: es-cluster
+      node.name: es-node
+      discovery.seed_hosts: es-node
+    ports:
+    - 9200:9200/tcp
+    - 9300:9300/tcp
+  kibana:
+    hostname: kibana
+    container_name: kibana
+    image: kibana:7.10.1
+    environment: 
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+    - 80:5601/tcp
+  filebeat:
+    hostname: filebeat
+    container_name: filebeat
+    image: elastic/filebeat:7.10.1
+    volumes: 
+    - ./filebeat/filebeat.yaml:/usr/share/filebeat/filebeat.yml
+    environment:
+      BOOTSTRAP_SERVER: $BOOTSTRAP_SERVER
+      KAFKA_CLUSTER_KEY: $KAFKA_CLUSTER_KEY
+      KAFKA_CLUSTER_SECRET: $KAFKA_CLUSTER_SECRET
+

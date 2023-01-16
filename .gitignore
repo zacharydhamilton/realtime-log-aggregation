@@ -1,0 +1,8 @@
+tf_*.sh
+k8s_*.*
+*secrets*.sh
+*env*.sh
+
+k8s/
+promtail/
+connect/

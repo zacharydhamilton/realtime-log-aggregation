@@ -1,0 +1,12 @@
+filebeat.inputs:
+- type: kafka
+  hosts:
+    - '${BOOTSTRAP_SERVER}'
+  topics: ["java-apps", "logs-enriched", "events", "anomalies"]
+  group_id: "filebeat"
+  ssl.enabled: yes
+  username: '${KAFKA_CLUSTER_KEY}'
+  password: '${KAFKA_CLUSTER_SECRET}'
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
