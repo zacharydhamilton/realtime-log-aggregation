@@ -44,7 +44,7 @@ In order to have this work when they're actually running, you might also need to
 
 1. Create a file called `env.sh` to store your Cloud API Key and secret. Replace the placeholder values in the command below. 
     ```bash
-    echo "export CONFLUENT_CLOUD_API_KEY="<cloud-key>"\nexport CONFLUENT_CLOUD_API_SECRET="<cloud-secret>" > env.sh 
+    echo "export CONFLUENT_CLOUD_API_KEY="<cloud-key>"\nexport CONFLUENT_CLOUD_API_SECRET="<cloud-secret>"" > env.sh 
     ```
 
 1. Source the variables to the console so they will be set for Terraform. 
