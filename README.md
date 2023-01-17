@@ -259,10 +259,11 @@ In order to have this work when they're actually running, you might also need to
 
 1. Finally, create a stream for the `anomalies` topic. Then, create the query to write matching records into it. 
     ```sql
-    CREATE STREAM error_rates_changelog (
+    CREATE STREAM anomalies (
+        `@timestamp` DOUBLE,
         `errors` INT,
         `classes` ARRAY<VARCHAR>
-    ) WITH (KAFKA_TOPIC='error_rates', VALUE_FORMAT='JSON');
+    ) WITH (KAFKA_TOPIC='anomalies', VALUE_FORMAT='JSON');
     ```
     ```sql
     INSERT INTO anomalies
