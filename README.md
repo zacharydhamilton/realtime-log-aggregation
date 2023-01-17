@@ -68,9 +68,12 @@ In order to have this work when they're actually running, you might also need to
     terraform apply
     ```
 
-1. Once the resources have been created, source the secrets created by Terraform so they can be used by Docker. 
+1. Once the resources have been created, navigate back to the root directory and source the secrets created by Terraform so they can be used by Docker.
     ```bash
-    source ../secrets.sh
+    cd ..
+    ```
+    ```bash
+    source secrets.sh
     ```
 
 1. Now that the secrets about your cluster have been exported to the console, bring the the Docker services online. 
